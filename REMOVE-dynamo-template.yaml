@@ -111,6 +111,19 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
+# https://github.com/aws-samples/aws-sam-java-rest/blob/master/template.yaml
+#     OrdersTable:
+# Type: AWS::DynamoDB::Table
+# Properties:
+#   TableName: orders_table
+#   AttributeDefinitions:
+#     - AttributeName: orderId
+#       AttributeType: S
+#   KeySchema:
+#     - AttributeName: orderId
+#       KeyType: HASH
+#   BillingMode: PAY_PER_REQUEST
+
 Outputs:
   WebEndpoint:
     Description: API Gateway endpoint URL for Prod stage
