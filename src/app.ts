@@ -1,6 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import AWS from 'aws-sdk';
 
+const dyn = new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://docker.for.mac.localhost:8000') });
+const tableName: string | undefined = process.env.CARDS_TABLE;
+
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -11,9 +14,6 @@ import AWS from 'aws-sdk';
  *
  */
 
-const dyn = new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://docker.for.mac.localhost:8000') });
-const tableName: string = process.env.CARDS_TABLE;
-
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
@@ -22,13 +22,19 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             if (!tablesList.TableNames?.length) {
                 return {
                     statusCode: 404,
-                    body: 'No local DynamoDB tables found. Please create with cmd provided.',
+                    body: 'No local DynamoDB tables found. Execute "docker run -p 8000:8000 amazon/dynamodb-local".',
+                };
+            }
+            if (!tableName) {
+                return {
+                    statusCode: 404,
+                    body: 'Missing env variables.',
                 };
             }
 
             // lambda start
             const params = {
-                TableName: 'CardsTable',
+                TableName: tableName,
                 // KeyConditionExpression: `#pk = :pk`,
                 // ExpressionAttributeNames: {
                 //     '#pk': '__typename',
