@@ -7,8 +7,8 @@
     "author": "SAM CLI",
     "license": "MIT",
     "dependencies": {
-        "esbuild": "^0.14.14",
-        "aws-sdk": "^2.799.0"
+        "aws-sdk": "^2.799.0",
+        "esbuild": "^0.14.14"
     },
     "scripts": {
         "unit": "jest",

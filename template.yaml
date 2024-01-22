@@ -8,8 +8,8 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
-    MemorySize: 128
+    Timeout: 120
+    MemorySize: 256
 
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
@@ -54,19 +54,21 @@ Resources:
       AttributeDefinitions:
         - AttributeName: cardId
           AttributeType: S
-        - AttributeName: type
+        - AttributeName: __typename
           AttributeType: S
       KeySchema:
         - AttributeName: cardId
           KeyType: HASH
+        - AttributeName: __typename
+          KeyType: RANGE
       # provision a GSI on card type (i.e. Credit) to query all credit cards without a scan
-      GlobalSecondaryIndexes:
-        - IndexName: type-index
-          KeySchema:
-            - AttributeName: type
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
+      # GlobalSecondaryIndexes:
+      #   - IndexName: typename-index
+      #     KeySchema:
+      #       - AttributeName: __typename
+      #         KeyType: HASH
+      #     Projection:
+      #       ProjectionType: ALL
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

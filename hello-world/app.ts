@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import AWS from 'aws-sdk';
 
 /**
  *
@@ -10,37 +11,40 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
  *
  */
 
-// Create clients and set shared const values outside of the handler.
-
-// Create a DocumentClient that represents the query to add an item
-import dynamodb from 'aws-sdk/clients/dynamodb';
-const docClient = new dynamodb.DocumentClient();
-
-// Get the DynamoDB table name from environment variables
+const dyn = new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://docker.for.mac.localhost:8000') });
 const tableName: string = process.env.CARDS_TABLE;
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
         try {
-            const params = {
-                TableName: tableName,
-                IndexName: 'type-index',
-                KeyConditionExpression: `#pk = :pk`,
-                ExpressionAttributeNames: {
-                    '#pk': 'type',
-                },
-                ExpressionAttributeValues: {
-                    ':pk': 'Credit',
-                    ':deleted': 0,
-                },
-            };
+            const tablesList = await dyn.listTables({ Limit: 10 }).promise();
+            if (!tablesList.TableNames?.length) {
+                return {
+                    statusCode: 404,
+                    body: 'No local DynamoDB tables found. Please create with cmd provided.',
+                };
+            }
 
-            const result = await docClient.query(params).promise();
+            // lambda start
+            const params = {
+                TableName: 'CardsTable',
+                // KeyConditionExpression: `#pk = :pk`,
+                // ExpressionAttributeNames: {
+                //     '#pk': '__typename',
+                // },
+                // ExpressionAttributeValues: {
+                //     ':pk': 'Credit',
+                //     ':deleted': 0,
+                // },
+            };
+            const { Items = [] } = await dyn.scan(params).promise();
+            console.log(Items);
+            // lambda end
 
             response = {
                 statusCode: 200,
-                body: JSON.stringify(result),
+                body: JSON.stringify(Items),
             };
         } catch (ResourceNotFoundException) {
             response = {
