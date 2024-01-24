@@ -1,9 +1,14 @@
+export type CreditCardInput = {
+    name: string;
+    cardLimit?: number;
+    cardType?: string;
+};
+
 export type CreditCard = {
     cardId: string;
     name: string;
-    limit: number;
+    cardLimit: number;
     balance: number;
-    deleted: boolean;
     cardType: string;
-    __typename: string;
+    deleted?: boolean;
 };

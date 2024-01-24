@@ -26,7 +26,7 @@ describe('GET /credit-cards', function () {
     });
 
     it('verifies successful response with items', async () => {
-        const mockedItems = [{ cardId: 'cardId', name: 'Paddy', limit: 100, __typename: 'Credit', cardType: 'Visa' }];
+        const mockedItems = [{ cardId: 'cardId', name: 'Paddy', cardLimit: 100, cardType: 'Visa' }];
         mockScanPromise.mockReturnValueOnce({ Items: mockedItems });
 
         const result: APIGatewayProxyResult = await lambdaHandler(getCreditCardsEvent);

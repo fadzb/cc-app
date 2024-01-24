@@ -18,3 +18,13 @@ export const getDbClient = () => {
 export const scan = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: AWS.DynamoDB.Types.ScanInput }) => {
     return dbClient.scan(params).promise();
 };
+
+/**
+ * Creates a new item, or replaces an old item with a new item.
+ * @param dbClient the database client to use for the operation
+ * @param {AWS.DynamoDB.Types.PutItemInput} params the parameters used for the operation
+ * @returns a Promise that resolves to a list of Items found in the table
+ */
+export const putItem = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: AWS.DynamoDB.Types.PutItemInput }) => {
+    return dbClient.putItem(params).promise();
+};

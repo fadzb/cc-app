@@ -84,18 +84,18 @@ Resources:
       AttributeDefinitions:
         - AttributeName: cardId
           AttributeType: S
-        - AttributeName: __typename
+        - AttributeName: cardType
           AttributeType: S
       KeySchema:
         - AttributeName: cardId
           KeyType: HASH
-        - AttributeName: __typename
+        - AttributeName: cardType
           KeyType: RANGE
-      # provision a GSI on card type (i.e. Credit) to query all credit cards without a scan
+      # provision a GSI for each card type (i.e. Visa, MasterCard) to query for all credit cards without a scan
       # GlobalSecondaryIndexes:
-      #   - IndexName: typename-index
+      #   - IndexName: cardType-index
       #     KeySchema:
-      #       - AttributeName: __typename
+      #       - AttributeName: cardType
       #         KeyType: HASH
       #     Projection:
       #       ProjectionType: ALL

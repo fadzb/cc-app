@@ -12,7 +12,7 @@ const schema = yup.object({});
 
 /**
  * Fetches all registered credit card accounts.
- * Usage: curl http://127.0.0.1:3000/credit-cards
+ * Usage: curl http://localhost:3000/credit-cards
  * @param {Object} event - API Gateway Lambda Proxy Input Format
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
@@ -25,7 +25,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const params = { TableName: cardsTableName };
         const { Items = [] } = await scan({ dbClient, params });
 
-        response = buildResponse({ statusCode: 200, body: Items });
+        response = buildResponse({ statusCode: 200, body: { items: Items } });
     } catch (err: unknown) {
         return handleErrors(err);
     }
