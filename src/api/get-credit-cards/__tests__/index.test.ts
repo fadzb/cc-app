@@ -1,8 +1,9 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
+import getCreditCardsEvent from '../../../../events/getCreditCardsEvent.json';
 
 import { expect, describe, it } from '@jest/globals';
 
-const mockScanPromise = jest.fn(() => ({ Items: [] }));
+const mockScanPromise: any = jest.fn(() => ({ Items: [] }));
 const mockScan = jest.fn(() => ({
     promise: mockScanPromise,
 }));
@@ -16,126 +17,21 @@ jest.mock('aws-sdk', () => ({
 
 import { lambdaHandler } from '../index';
 
-describe('Unit test for get request', function () {
+describe('GET /credit-cards', function () {
     it('verifies successful response', async () => {
-        const event: APIGatewayProxyEvent = {
-            httpMethod: 'get',
-            body: '',
-            headers: {},
-            isBase64Encoded: false,
-            multiValueHeaders: {},
-            multiValueQueryStringParameters: {},
-            path: '/credit-cards',
-            pathParameters: {},
-            queryStringParameters: {},
-            requestContext: {
-                accountId: '123456789012',
-                apiId: '1234',
-                authorizer: {},
-                httpMethod: 'get',
-                identity: {
-                    accessKey: '',
-                    accountId: '',
-                    apiKey: '',
-                    apiKeyId: '',
-                    caller: '',
-                    clientCert: {
-                        clientCertPem: '',
-                        issuerDN: '',
-                        serialNumber: '',
-                        subjectDN: '',
-                        validity: { notAfter: '', notBefore: '' },
-                    },
-                    cognitoAuthenticationProvider: '',
-                    cognitoAuthenticationType: '',
-                    cognitoIdentityId: '',
-                    cognitoIdentityPoolId: '',
-                    principalOrgId: '',
-                    sourceIp: '',
-                    user: '',
-                    userAgent: '',
-                    userArn: '',
-                },
-                path: '/credit-cards',
-                protocol: 'HTTP/1.1',
-                requestId: 'c6af9ac6-7b61-11e6-9a41-93e8deadbeef',
-                requestTimeEpoch: 1428582896000,
-                resourceId: '123456',
-                resourcePath: '/credit-cards',
-                stage: 'dev',
-            },
-            resource: '',
-            stageVariables: {},
-        };
-        const result: APIGatewayProxyResult = await lambdaHandler(event);
+        const result: APIGatewayProxyResult = await lambdaHandler(getCreditCardsEvent);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(
-            JSON.stringify({
-                message: [],
-            }),
-        );
+        expect(result.body).toEqual(JSON.stringify([]));
     });
 
     it('verifies successful response with items', async () => {
-        mockScanPromise.mockReturnValueOnce({ Items: [] }); // TODO: Mock items
+        const mockedItems = [{ cardId: 'cardId', name: 'Paddy', limit: 100, __typename: 'Credit', cardType: 'Visa' }];
+        mockScanPromise.mockReturnValueOnce({ Items: mockedItems });
 
-        const event: APIGatewayProxyEvent = {
-            httpMethod: 'get',
-            body: '',
-            headers: {},
-            isBase64Encoded: false,
-            multiValueHeaders: {},
-            multiValueQueryStringParameters: {},
-            path: '/credit-cards',
-            pathParameters: {},
-            queryStringParameters: {},
-            requestContext: {
-                accountId: '123456789012',
-                apiId: '1234',
-                authorizer: {},
-                httpMethod: 'get',
-                identity: {
-                    accessKey: '',
-                    accountId: '',
-                    apiKey: '',
-                    apiKeyId: '',
-                    caller: '',
-                    clientCert: {
-                        clientCertPem: '',
-                        issuerDN: '',
-                        serialNumber: '',
-                        subjectDN: '',
-                        validity: { notAfter: '', notBefore: '' },
-                    },
-                    cognitoAuthenticationProvider: '',
-                    cognitoAuthenticationType: '',
-                    cognitoIdentityId: '',
-                    cognitoIdentityPoolId: '',
-                    principalOrgId: '',
-                    sourceIp: '',
-                    user: '',
-                    userAgent: '',
-                    userArn: '',
-                },
-                path: '/credit-cards',
-                protocol: 'HTTP/1.1',
-                requestId: 'c6af9ac6-7b61-11e6-9a41-93e8deadbeef',
-                requestTimeEpoch: 1428582896000,
-                resourceId: '123456',
-                resourcePath: '/credit-cards',
-                stage: 'dev',
-            },
-            resource: '',
-            stageVariables: {},
-        };
-        const result: APIGatewayProxyResult = await lambdaHandler(event);
+        const result: APIGatewayProxyResult = await lambdaHandler(getCreditCardsEvent);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(
-            JSON.stringify({
-                message: [],
-            }),
-        );
+        expect(result.body).toEqual(JSON.stringify(mockedItems));
     });
 });

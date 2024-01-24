@@ -1,16 +1,13 @@
+import { getDbClient } from './../../utils/dbUtils';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import AWS, { DynamoDB } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 
-const dyn = new AWS.DynamoDB({
-    endpoint: new AWS.Endpoint('http://docker.for.mac.localhost:8000'),
-});
-const tableName: string | undefined = process.env.CARDS_TABLE;
+const dynamoClient = getDbClient();
+const tableName = process.env.CARDS_TABLE as string;
 const __TYPENAME = 'Credit';
 
-// curl -d '{"name":"Paddy", "limit":"1000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards
-
 /**
+ * Usage: curl curl -d '{"name":"Paddy", "limit":"1000"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:3000/credit-cards
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
  * @param {Object} event - API Gateway Lambda Proxy Input Format
@@ -24,13 +21,13 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     let response: APIGatewayProxyResult;
     try {
         try {
-            const tablesList = await dyn.listTables({ Limit: 10 }).promise();
-            if (!tablesList.TableNames?.length) {
-                return {
-                    statusCode: 404,
-                    body: 'No local DynamoDB tables found. Execute "docker run -p 8000:8000 amazon/dynamodb-local".',
-                };
-            }
+            // const tablesList = await documentClient.listTables({ Limit: 10 }).promise();
+            // if (!tablesList.TableNames?.length) {
+            //     return {
+            //         statusCode: 404,
+            //         body: 'No local DynamoDB tables found. Execute "docker run -p 8000:8000 amazon/dynamodb-local".',
+            //     };
+            // }
             if (!tableName) {
                 return {
                     statusCode: 404,
@@ -56,7 +53,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                 Item: Item,
             };
 
-            await dyn.putItem(params).promise();
+            await dynamoClient.putItem(params).promise();
 
             response = {
                 statusCode: 200,
