@@ -1,67 +1,35 @@
+import { validateEvent } from './../../utils/authUtils';
+import { buildResponse, handleErrors } from './../../utils/lambdaUtils';
+import { logResponse } from '../../utils/logUtils';
+import { getDbClient, scan } from '../../utils/dbUtils';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import AWS, { DynamoDB } from 'aws-sdk';
-import { v4 as uuid } from 'uuid';
+import * as yup from 'yup';
 
-const dyn = new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://docker.for.mac.localhost:8000') });
-const tableName: string | undefined = process.env.CARDS_TABLE;
-const __TYPENAME = 'Credit';
+const cardsTableName = process.env.CARDS_TABLE as string;
 
-// curl http://localhost:3000/credit-cards
+const dbClient = getDbClient();
+const schema = yup.object({});
 
 /**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+ * Fetches all registered credit card accounts.
+ * Usage: curl http://127.0.0.1:3000/credit-cards
  * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
-        try {
-            // const tablesList = await dyn.listTables({ Limit: 10 }).promise();
-            // if (!tablesList.TableNames?.length) {
-            //     return {
-            //         statusCode: 404,
-            //         body: 'No local DynamoDB tables found. Execute "docker run -p 8000:8000 amazon/dynamodb-local".',
-            //     };
-            // }
-            // TODO: Move to util
-            if (!tableName) {
-                return {
-                    statusCode: 404,
-                    body: 'Missing env variables.',
-                };
-            }
+        validateEvent({ schema, event });
 
-            const params = { TableName: tableName };
-            const { Items = [] } = await dyn.scan(params).promise();
+        const params = { TableName: cardsTableName };
+        const { Items = [] } = await scan({ dbClient, params });
 
-            response = {
-                statusCode: 200,
-                body: JSON.stringify(Items),
-            };
-        } catch (ResourceNotFoundException) {
-            response = {
-                statusCode: 404,
-                body: 'Unable to call DynamoDB. Table resource not found.',
-            };
-        }
-
-        // All log statements are written to CloudWatch
-        console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
+        response = buildResponse({ statusCode: 200, body: Items });
     } catch (err: unknown) {
-        console.error(err);
-        response = {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: err instanceof Error ? err.message : 'some error happened',
-            }),
-        };
+        return handleErrors(err);
     }
 
+    logResponse({ event, response });
     return response;
 };
