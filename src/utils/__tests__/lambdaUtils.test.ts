@@ -36,7 +36,7 @@ describe('lambdaUtils', function () {
 
             const result = handleErrors(err);
 
-            expect(result.statusCode).toEqual(500);
+            expect(result.statusCode).toEqual(404);
             expect(result.body).toEqual(
                 JSON.stringify({
                     message:
@@ -53,7 +53,7 @@ describe('lambdaUtils', function () {
             expect(result.statusCode).toEqual(500);
             expect(result.body).toEqual(
                 JSON.stringify({
-                    message: 'UError message',
+                    message: 'Error message',
                 }),
             );
         });
