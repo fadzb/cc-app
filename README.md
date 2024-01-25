@@ -128,7 +128,7 @@ curl http://localhost:3000/credit-cards/{id}
 Paddy has been in the pub all night and needs an update to his credit limit to keep the pints going. Once again, use the _cardId_ as the {id}
 
 ```bash
-curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{id}
+curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X PUT http://localhost:3000/credit-cards/{id}
 ```
 
 Paddy has been charged a tenner on his way home for a spice bag. This time use the _originalCardNumber_ as the path parameter
