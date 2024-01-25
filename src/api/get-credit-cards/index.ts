@@ -22,7 +22,10 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     try {
         validateParams({ schema, params: event });
 
-        const params = { TableName: cardsTableName };
+        const params = {
+            TableName: cardsTableName,
+            FilterExpression: 'attribute_not_exists(deleted)',
+        };
         const { Items = [] } = await scan({ dbClient, params });
 
         response = buildResponse({ statusCode: 200, body: { items: Items } });

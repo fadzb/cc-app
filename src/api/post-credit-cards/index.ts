@@ -48,7 +48,7 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
         const params = {
             TableName: cardsTableName,
             Item,
-            ConditionExpression: 'attribute_not_exists(cardId)', // TODO: test
+            ConditionExpression: 'attribute_not_exists(cardId) and attribute_not_exists(deleted)',
         };
 
         await putItem({ dbClient, params });

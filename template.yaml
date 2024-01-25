@@ -135,6 +135,36 @@ Resources:
         # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
         EntryPoints:
           - index.ts
+  DeleteCreditCardsByIdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/delete-credit-cards-by-id/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{id}
+            Method: delete
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
 
   CardsTable:
     Type: AWS::DynamoDB::Table

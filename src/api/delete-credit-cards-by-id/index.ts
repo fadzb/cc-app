@@ -14,15 +14,11 @@ const eventSchema = yup.object({
     pathParameters: yup.object({
         id: yup.string().required().uuid(),
     }),
-    body: yup.string().required(),
-});
-const inputSchema = yup.object({
-    cardLimit: yup.number().required().positive(),
 });
 
 /**
- * Updates the cardLimit of an existing Credit Card
- * Usage: curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/${id}
+ * Soft deletes an existing Credit Card account by id
+ * Usage: curl -X DELETE http://localhost:3000/credit-cards/${id}
  * @param {Object} event - API Gateway Lambda Proxy Input Format
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
@@ -36,17 +32,12 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
             pathParameters: { id },
         } = event;
 
-        const parsedInput = JSON.parse(event.body);
-        validateParams({ schema: inputSchema, params: parsedInput });
-
-        const { cardLimit } = parsedInput;
-
         const params = {
             TableName: cardsTableName,
             Key: { cardId: { S: id } },
             ConditionExpression: 'attribute_exists(cardId) and attribute_not_exists(deleted)',
-            UpdateExpression: 'set cardLimit = :cardLimit',
-            ExpressionAttributeValues: { ':cardLimit': { N: `${cardLimit}` } },
+            UpdateExpression: 'set deleted = :deleted',
+            ExpressionAttributeValues: { ':deleted': { N: '1' } },
             ReturnValues: 'ALL_NEW',
         };
 

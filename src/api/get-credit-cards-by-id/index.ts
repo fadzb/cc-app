@@ -34,6 +34,7 @@ export const lambdaHandler = async (event: GetCreditCardByIdEvent): Promise<APIG
         const params = {
             TableName: cardsTableName,
             KeyConditionExpression: '#cardId = :cardId',
+            FilterExpression: 'attribute_not_exists(deleted)',
             ExpressionAttributeValues: { ':cardId': { S: id } },
             ExpressionAttributeNames: { '#cardId': 'cardId' },
         };
