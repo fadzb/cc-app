@@ -45,20 +45,7 @@ Finally, to build your application, run the following in your shell from the rep
 cc-app$ sam build && sam local start-api --env-vars env.json
 ```
 
-![Alt text](image-3.png)
-
-The SAM CLI installs dependencies defined in `src/package.json`, compiles TypeScript with esbuild, creates a deployment package, and saves it in the `.aws-sam/build` folder.
-
-The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
-
-```yaml
-Events:
-  GetCreditCardsFunction:
-    Type: Api
-    Properties:
-      Path: /credit-cards
-      Method: get
-```
+![Alt text](image-4.png)
 
 ## Using the application
 
