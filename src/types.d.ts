@@ -12,3 +12,13 @@ export type CreditCard = {
     cardType: string;
     deleted?: boolean;
 };
+
+type IDInput = {
+    id: string;
+};
+type GetCreditCardByIdInput = {
+    pathParameters: IDInput;
+};
+export type GetCreditCardByIdEvent = Omit<APIGatewayProxyEvent, 'pathParameters'> & GetCreditCardByIdInput;
+
+export type APIEvent = APIGatewayProxyEvent | GetCreditCardByIdEvent;

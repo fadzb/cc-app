@@ -55,14 +55,4 @@ describe('POST /credit-cards', function () {
         expect(result.statusCode).toEqual(500);
         expect(result.body).toEqual(JSON.stringify({ message: 'cardLimit must be a positive number' }));
     });
-
-    // it('verifies validation error if id in URL path is invalid', async () => {
-    //     const result: APIGatewayProxyResult = await lambdaHandler({
-    //         ...event,
-    //         body: JSON.stringify({ ...JSON.parse(event.body), cardLimit: -1000 }),
-    //     });
-
-    //     expect(result.statusCode).toEqual(500);
-    //     expect(result.body).toEqual(JSON.stringify({ message: 'name is a required field' }));
-    // });
 });

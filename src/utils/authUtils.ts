@@ -1,4 +1,3 @@
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import { AnyObjectSchema } from 'yup';
 
 /**
@@ -6,6 +5,6 @@ import { AnyObjectSchema } from 'yup';
  * @param {AnyObjectSchema} schema contains the validations to enforce.
  * @param {APIGatewayProxyEvent} event the event to validate
  */
-export const validateEvent = ({ schema, event }: { schema: AnyObjectSchema; event: APIGatewayProxyEvent }) => {
+export const validateEvent = ({ schema, event }: { schema: AnyObjectSchema; event: unknown }) => {
     schema.validateSync(event);
 };

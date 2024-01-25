@@ -46,7 +46,6 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const params = {
             TableName: cardsTableName,
             Item,
-            ReturnValues: 'ALL_OLD',
         };
 
         await putItem({ dbClient, params });

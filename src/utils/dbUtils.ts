@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import { logger } from './logUtils';
 
 /**
  * @returns the database client for the application
@@ -27,4 +28,14 @@ export const scan = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: AWS
  */
 export const putItem = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: AWS.DynamoDB.Types.PutItemInput }) => {
     return dbClient.putItem(params).promise();
+};
+
+/**
+ * Queries for item by partition key value (and sort key if supported)
+ * @param dbClient the database client to use for the operation
+ * @param {AWS.DynamoDB.Types.QueryInput} params the parameters used for the operation
+ * @returns a Promise that resolves to a list of Items found in the table
+ */
+export const query = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: AWS.DynamoDB.Types.QueryInput }) => {
+    return dbClient.query(params).promise();
 };
