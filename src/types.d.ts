@@ -1,9 +1,11 @@
+type CardType = 'Mastercard' | 'Visa';
+
 export type CreditCard = {
     cardId: string;
     name: string;
     cardLimit: number;
     balance: number;
-    cardType: string;
+    cardType: CardType;
     deleted?: boolean;
 };
 

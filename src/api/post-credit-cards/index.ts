@@ -17,7 +17,7 @@ const eventSchema = yup.object({
 const inputSchema = yup.object({
     name: yup.string().required(),
     cardLimit: yup.number().positive(),
-    cardType: yup.string(),
+    cardType: yup.string().oneOf(['Visa', 'Mastercard']),
 });
 
 /**

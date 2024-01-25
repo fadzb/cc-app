@@ -46,7 +46,7 @@ describe('POST /credit-cards', function () {
         expect(result.body).toEqual(JSON.stringify({ message: 'name is a required field' }));
     });
 
-    it('verifies validation error if cardholder credit limit is negative', async () => {
+    it('verifies validation error if credit limit is negative', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler({
             ...event,
             body: JSON.stringify({ ...JSON.parse(event.body), cardLimit: -1000 }),
@@ -54,5 +54,17 @@ describe('POST /credit-cards', function () {
 
         expect(result.statusCode).toEqual(500);
         expect(result.body).toEqual(JSON.stringify({ message: 'cardLimit must be a positive number' }));
+    });
+
+    it('verifies validation error if card type is invalid', async () => {
+        const result: APIGatewayProxyResult = await lambdaHandler({
+            ...event,
+            body: JSON.stringify({ ...JSON.parse(event.body), cardType: 'INVALID' }),
+        });
+
+        expect(result.statusCode).toEqual(500);
+        expect(result.body).toEqual(
+            JSON.stringify({ message: 'cardType must be one of the following values: Visa, Mastercard' }),
+        );
     });
 });
