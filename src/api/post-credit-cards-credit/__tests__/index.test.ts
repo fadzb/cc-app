@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import event from '../../../../events/post-credit-cards-charge/event.json';
+import event from '../../../../events/post-credit-cards-credit/event.json';
 
 import { expect, describe, it } from '@jest/globals';
 
@@ -27,21 +27,21 @@ jest.mock('../../../utils/logUtils', () => ({
 const mockTransaction = { amount: 10, currency: 'eur' };
 const mockPaymentClient = {};
 const mockGetPaymentClient = jest.fn(() => mockPaymentClient);
-const mockIssueCharge = jest.fn(() => mockTransaction);
+const mockIssueCredit = jest.fn(() => mockTransaction);
 jest.mock('../../../utils/paymentUtils', () => ({
     getPaymentClient: mockGetPaymentClient,
-    issueCharge: mockIssueCharge,
+    issueCredit: mockIssueCredit,
 }));
 
 jest.mock('uuid', () => ({ v4: () => 'uuid' }));
 
 import { lambdaHandler } from '../index';
 
-describe('POST /credit-cards/{originalCardNumber}/charge', function () {
+describe('POST /credit-cards/{originalCardNumber}/credit', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-        expect(mockIssueCharge).toHaveBeenCalledWith({
+        expect(mockIssueCredit).toHaveBeenCalledWith({
             amount: JSON.parse(event.body).amount,
             originalCardNumber: event.pathParameters.originalCardNumber,
             paymentClient: mockPaymentClient,
@@ -49,7 +49,7 @@ describe('POST /credit-cards/{originalCardNumber}/charge', function () {
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(
             JSON.stringify({
-                message: `Account successfully charged for ${mockTransaction.amount} ${mockTransaction.currency}`,
+                message: `Account successfully credited for ${mockTransaction.amount} ${mockTransaction.currency}`,
             }),
         );
     });

@@ -22,7 +22,7 @@ describe('GET /credit-cards', function () {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify([]));
+        expect(result.body).toEqual(JSON.stringify({ items: [] }));
     });
 
     it('verifies successful response with items', async () => {
@@ -32,6 +32,6 @@ describe('GET /credit-cards', function () {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(mockedItems));
+        expect(result.body).toEqual(JSON.stringify({ items: mockedItems }));
     });
 });

@@ -1,10 +1,10 @@
-import { getPaymentClient, issueCharge } from './../../utils/paymentUtils';
+import { getPaymentClient, issueCredit } from '../../utils/paymentUtils';
 import { PutCreditCardByIdEvent } from '../../types';
 import { APIGatewayProxyResult } from 'aws-lambda';
 import * as yup from 'yup';
 import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
-import { logResponse } from '../../utils/logUtils';
+import { logResponse, logger } from '../../utils/logUtils';
 
 const paymentApiKey = process.env.PAYMENT_API_KEY as string;
 
@@ -21,8 +21,8 @@ const inputSchema = yup.object({
 });
 
 /**
- * Charge the credit card account by the amount provided
- * Usage: curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/charge
+ * Credit the card account by the amount provided
+ * Usage: curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/credit
  * @param {Object} event - API Gateway Lambda Proxy Input Format
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
@@ -41,11 +41,11 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
 
         const { amount } = parsedInput;
 
-        const transaction = await issueCharge({ paymentClient, amount, originalCardNumber });
+        const transaction = await issueCredit({ paymentClient, amount, originalCardNumber });
 
         response = buildResponse({
             statusCode: 200,
-            body: { message: `Account successfully charged for ${transaction.amount} ${transaction.currency}` },
+            body: { message: `Account successfully credited for ${transaction.amount} ${transaction.currency}` },
         });
     } catch (err: unknown) {
         return handleErrors(err);
