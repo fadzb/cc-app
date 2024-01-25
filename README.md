@@ -24,7 +24,7 @@ To use the SAM CLI, you need the following tools.
 To use dynamoDB Local, you will need to start the database server using docker:
 
 ```bash
-$ docker run -p 8000:8000 amazon/dynamodb-local
+docker run -p 8000:8000 amazon/dynamodb-local
 ```
 
 ![Alt text](image-2.png)
@@ -34,15 +34,15 @@ $ docker run -p 8000:8000 amazon/dynamodb-local
 Then, in another terminal, you will need to use the AWS CLI to build the table similar to the one found in the `template.yaml`. This is only because we will be running the application locally, otherwise, CloudFormation would provision the table specified in the `template.yaml` as part of the deployment.
 
 ```bash
-$ aws dynamodb create-table  --table-name CardsTable --attribute-definitions AttributeName=cardId,AttributeType=S --key-schema AttributeName=cardId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
+aws dynamodb create-table  --table-name CardsTable --attribute-definitions AttributeName=cardId,AttributeType=S --key-schema AttributeName=cardId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
 ```
 
 ![Alt text](image-1.png)
 
-Finally, to build your application, run the following in your shell from the repository's root. The SAM CLI can emulate your application's API. The second command below `sam local start-api` will run the API locally on port 3000.:
+Finally, to build your application, run the following in your shell from the repository's root (~/cc-app/). The SAM CLI can emulate your application's API. The second command below `sam local start-api` will run the API locally on port 3000.:
 
 ```bash
-cc-app$ sam build && sam local start-api --env-vars env.json
+sam build && sam local start-api --env-vars env.json
 ```
 
 ![Alt text](image-4.png)
@@ -54,7 +54,7 @@ The following commands can be used to test the application in a terminal:
 Create an VISA account for Paddy with a credit limit of €1000.
 
 ```bash
-$ curl -d '{"name":"Paddy", "cardType":"Visa", "cardLimit":"1000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards
+curl -d '{"name":"Paddy", "cardType":"Visa", "cardLimit":"1000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards
 ```
 
 > Note: Try using the home address explicitly (i.e. http://127.0.0.1:3000/credit-cards) if there is no reply from localhost
@@ -62,37 +62,37 @@ $ curl -d '{"name":"Paddy", "cardType":"Visa", "cardLimit":"1000"}' -H "Content-
 Fetch the newly created account by using the _cardId_ returned from the previous request as the {id} path parameter here:
 
 ```bash
-$ curl http://localhost:3000/credit-cards/{id}
+curl http://localhost:3000/credit-cards/{id}
 ```
 
 Paddy has been in the pub all night and needs an update to his credit limit to keep the pints going. Once again, use the _cardId_ as the {id}
 
 ```bash
-$ curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{id}
+curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{id}
 ```
 
 Paddy has been charged a tenner on his way home for a spice bag. This time use the _originalCardNumber_ as the path parameter
 
 ```bash
-$ curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/charge
+curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/charge
 ```
 
 The chips weren't great so a refund is in order. Use the _originalCardNumber_ again as the path parameter to credit the account.
 
 ```bash
-$ curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/credit
+curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{originalCardNumber}/credit
 ```
 
 The bank is not happy with Paddy's spending and has decided to delete his account. Use the _cardId_ as the {id} path parameter to soft delete the account (marks it with a _deleted_ flag so its no longer included in responses but can be re-activated if needed).
 
 ```bash
-$ curl -X DELETE http://localhost:3000/credit-cards/{id}
+curl -X DELETE http://localhost:3000/credit-cards/{id}
 ```
 
 Verify that the account has been deleted by requesting ALL active accounts using this GET request:
 
 ```bash
-$ curl http://localhost:3000/credit-cards
+curl http://localhost:3000/credit-cards
 ```
 
 ## Unit tests
