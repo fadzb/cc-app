@@ -104,3 +104,5 @@ cc-app$ cd src
 src$ npm install
 src$ npm run test
 ```
+
+![Alt text](image-5.png)
