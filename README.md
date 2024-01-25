@@ -31,7 +31,7 @@ $ docker run -p 8000:8000 amazon/dynamodb-local
 
 > Note: Restarting the server will require the table resources to be rebuilt as instructed below
 
-Then, in another terminal, you will need to use the AWS CLI to build the table similar to the one found in the `template.yaml`. This is only needed when running the application locally, otherwise, CloudFormation will provision the table as specified in the `template.yaml`:
+Then, in another terminal, you will need to use the AWS CLI to build the table similar to the one found in the `template.yaml`. This is only because we will be running the application locally, otherwise, CloudFormation would provision the table specified in the `template.yaml` as part of the deployment.
 
 ```bash
 $ aws dynamodb create-table  --table-name CardsTable --attribute-definitions AttributeName=cardId,AttributeType=S --key-schema AttributeName=cardId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000

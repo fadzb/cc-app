@@ -240,7 +240,7 @@ Resources:
       KeySchema:
         - AttributeName: cardId
           KeyType: HASH
-      # provision a GSI for each card type (i.e. Visa, MasterCard) to query for all credit cards without a scan
+      # TODO: provision a GSI for each card type (i.e. Visa, MasterCard) to query for all credit cards without a scan
       # GlobalSecondaryIndexes:
       #   - IndexName: cardType-index
       #     KeySchema:
