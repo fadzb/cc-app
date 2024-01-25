@@ -57,6 +57,8 @@ Create an VISA account for Paddy with a credit limit of €1000.
 $ curl -d '{"name":"Paddy", "cardType":"Visa", "cardLimit":"1000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards
 ```
 
+> Note: Try using the home address explicitly (i.e. http://127.0.0.1:3000/credit-cards) if there is no reply from localhost
+
 Fetch the newly created account by using the _cardId_ returned from the previous request as the {id} path parameter here:
 
 ```bash
