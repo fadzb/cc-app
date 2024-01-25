@@ -11,6 +11,66 @@ This project contains source code and supporting files for a serverless applicat
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. However, NO DEPLOY NEEDED! All resources are locally executable using steps below.
 
+```bash
+events
+   |-- delete-credit-cards-by-id
+   |   |-- event.json
+   |-- get-credit-cards-by-id
+   |   |-- event.json
+   |-- get-credit-cards
+   |   |-- event.json
+   |-- post-credit-cards-charge
+   |   |-- event.json
+   |-- post-credit-cards-credit
+   |   |-- event.json
+   |-- post-credit-cards
+   |   |-- event.json
+   |-- put-credit-cards-by-id
+   |   |-- event.json
+src
+   |-- api
+   |   |-- delete-credit-cards-by-id
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- get-credit-cards-by-id
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- get-credit-cards
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- post-credit-cards-charge
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- post-credit-cards-credit
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- post-credit-cards
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |   |-- put-credit-cards-by-id
+   |   |   |-- __tests__
+   |   |   |   |-- index.test.ts
+   |   |   |-- index.ts
+   |-- package.json
+   |-- types.d.ts
+   |-- utils
+   |   |-- __tests__
+   |   |   |-- lambdaUtils.test.ts
+   |   |   |-- paymentUtils.test.ts
+   |   |-- authUtils.ts
+   |   |-- dbUtils.ts
+   |   |-- lambdaUtils.ts
+   |   |-- logUtils.ts
+   |   |-- paymentUtils.ts
+template.yaml
+```
+
 ## Running the application locally
 
 The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
