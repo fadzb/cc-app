@@ -4,7 +4,6 @@ export type CreditCard = {
     cardId: string;
     name: string;
     cardLimit: number;
-    balance: number;
     cardType: CardType;
     deleted?: boolean;
 };

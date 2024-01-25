@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import event from '../../../../events/put-credit-cards-by-id/event.json';
+import event from '../../../../events/post-credit-cards-charge/event.json';
 
 import { expect, describe, it } from '@jest/globals';
 
@@ -24,35 +24,46 @@ jest.mock('../../../utils/logUtils', () => ({
     },
 }));
 
+const mockTransaction = { id: 'transactionId' };
+const mockPaymentClient = {};
+const mockGetPaymentClient = jest.fn(() => mockPaymentClient);
+const mockissueCharge = jest.fn(() => mockTransaction);
+jest.mock('../../../utils/paymentUtils', () => ({
+    getPaymentClient: mockGetPaymentClient,
+    issueCharge: mockissueCharge,
+}));
+
 jest.mock('uuid', () => ({ v4: () => 'uuid' }));
 
 import { lambdaHandler } from '../index';
 
-describe('PUT /credit-cards/{id}', function () {
+describe('POST /credit-cards/{originalCardNumber}/charge', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toBeUndefined();
-    });
-
-    it('verifies successful response with updated item when found', async () => {
-        const item = { cardId: 'cardId', name: 'Paddy', cardLimit: 100, cardType: 'Visa' };
-        mockUpdateItemPromise.mockReturnValueOnce({ Attributes: item });
-
-        const result: APIGatewayProxyResult = await lambdaHandler(event);
-
-        expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(item));
+        expect(result.body).toEqual(JSON.stringify(mockTransaction));
     });
 
     it('verifies validation error if cardholder updated credit limit is negative', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler({
             ...event,
-            body: JSON.stringify({ ...JSON.parse(event.body), cardLimit: -1000 }),
+            body: JSON.stringify({ ...JSON.parse(event.body), amount: -10 }),
         });
 
         expect(result.statusCode).toEqual(500);
-        expect(result.body).toEqual(JSON.stringify({ message: 'cardLimit must be a positive number' }));
+        expect(result.body).toEqual(JSON.stringify({ message: 'amount must be a positive number' }));
+    });
+
+    it('verifies validation error if originalCardNumber in URL path is invalid', async () => {
+        const result: APIGatewayProxyResult = await lambdaHandler({
+            ...event,
+            pathParameters: { originalCardNumber: null },
+        });
+
+        expect(result.statusCode).toEqual(500);
+        expect(result.body).toEqual(
+            JSON.stringify({ message: 'pathParameters.originalCardNumber is a required field' }),
+        );
     });
 });
