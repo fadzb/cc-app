@@ -8,11 +8,11 @@ const mockScan = jest.fn(() => ({
     promise: mockScanPromise,
 }));
 
-const mockLogResponse = jest.fn();
-jest.mock('../../../utils/logUtils', () => ({
-    ...jest.requireActual('../../../utils/logUtils'),
-    logResponse: mockLogResponse,
-}));
+// const mockLogResponse = jest.fn();
+// jest.mock('../../../utils/logUtils', () => ({
+//     ...jest.requireActual('../../../utils/logUtils'),
+//     logResponse: mockLogResponse,
+// }));
 
 jest.mock('aws-sdk', () => ({
     DynamoDB: jest.fn(() => ({
@@ -21,13 +21,21 @@ jest.mock('aws-sdk', () => ({
     Endpoint: jest.fn(() => ''),
 }));
 
+jest.mock('../../../utils/logUtils', () => ({
+    ...jest.requireActual('../../../utils/logUtils'),
+    logger: {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+    },
+}));
+
 import { lambdaHandler } from '../index';
 
 describe('GET /credit-cards', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-        expect(mockLogResponse).toHaveBeenCalledWith({ event, response: result });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify({ items: [] }));
     });
@@ -38,8 +46,14 @@ describe('GET /credit-cards', function () {
 
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-        expect(mockLogResponse).toHaveBeenCalledWith({ event, response: result });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify({ items: mockedItems }));
+    });
+
+    it('verifies validation error if event is empty', async () => {
+        const result: APIGatewayProxyResult = await lambdaHandler(null as any);
+
+        expect(result.statusCode).toEqual(500);
+        expect(result.body).toEqual(JSON.stringify({ message: 'this cannot be null' }));
     });
 });

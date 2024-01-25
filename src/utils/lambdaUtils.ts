@@ -29,7 +29,10 @@ export const handleErrors = (err: unknown) => {
         case 'ResourceNotFoundException': {
             return buildResponse({
                 statusCode: 404,
-                body: { message: 'Unable to call DynamoDB. Table resource not found. Please refer to README.' },
+                body: {
+                    message:
+                        'Unable to call DynamoDB: Table resource not found. Ensure the local DB server is running and the table has been created using the AWS CLI.',
+                },
             });
         }
         default:
