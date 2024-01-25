@@ -23,13 +23,13 @@ export const handleErrors = (err: unknown) => {
         case 'ConditionalCheckFailedException': {
             return buildResponse({
                 statusCode: 404,
-                body: { message: 'Item not found.' },
+                body: { message: 'Item not found within Table.' },
             });
         }
         case 'ResourceNotFoundException': {
             return buildResponse({
                 statusCode: 404,
-                body: { message: 'Unable to call DynamoDB. Table resource not found.' },
+                body: { message: 'Unable to call DynamoDB. Table resource not found. Please refer to README.' },
             });
         }
         default:

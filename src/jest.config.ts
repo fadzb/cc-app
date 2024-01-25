@@ -9,6 +9,8 @@ export default {
     },
     clearMocks: true,
     collectCoverage: true,
+    collectCoverageFrom: ['**/*.ts'],
+    coveragePathIgnorePatterns: ['jest.config.ts', 'types.d.ts'],
     coverageDirectory: 'coverage',
     coverageProvider: 'v8',
     testMatch: ['**/__tests__/**/*.test.ts'],

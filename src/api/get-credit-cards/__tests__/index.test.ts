@@ -8,6 +8,12 @@ const mockScan = jest.fn(() => ({
     promise: mockScanPromise,
 }));
 
+const mockLogResponse = jest.fn();
+jest.mock('../../../utils/logUtils', () => ({
+    ...jest.requireActual('../../../utils/logUtils'),
+    logResponse: mockLogResponse,
+}));
+
 jest.mock('aws-sdk', () => ({
     DynamoDB: jest.fn(() => ({
         scan: mockScan,
@@ -21,6 +27,7 @@ describe('GET /credit-cards', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
+        expect(mockLogResponse).toHaveBeenCalledWith({ event, response: result });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify({ items: [] }));
     });
@@ -31,6 +38,7 @@ describe('GET /credit-cards', function () {
 
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
+        expect(mockLogResponse).toHaveBeenCalledWith({ event, response: result });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify({ items: mockedItems }));
     });
