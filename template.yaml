@@ -1,0 +1,274 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  cc-app
+
+  Sample SAM Template for cc-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 120
+    MemorySize: 256
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  PostCreditCardsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/post-credit-cards/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+          PAYMENT_API_KEY: !Ref PaymentApiKey
+      Events:
+        PostCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  GetCreditCardsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/get-credit-cards/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards
+            Method: get
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  GetCreditCardsByIdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/get-credit-cards-by-id/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{id}
+            Method: get
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  PutCreditCardsByIdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/put-credit-cards-by-id/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{id}
+            Method: put
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  DeleteCreditCardsByIdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/delete-credit-cards-by-id/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{id}
+            Method: delete
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  PostCreditCardsChargeFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/post-credit-cards-charge/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+          PAYMENT_API_KEY: !Ref PaymentApiKey
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{originalCardNumber}/charge
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+  PostCreditCardsCreditFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/api/post-credit-cards-credit/
+      Handler: index.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the CardsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CardsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CARDS_TABLE: !Ref CardsTable
+          PAYMENT_API_KEY: !Ref PaymentApiKey
+      Events:
+        GetCreditCards:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /credit-cards/{originalCardNumber}/credit
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - index.ts
+
+  CardsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: cards_table
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: cardId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: cardId
+          KeyType: HASH
+      # TODO: provision a GSI for each card type (i.e. Visa, MasterCard) to query for all credit cards without a scan
+      # GlobalSecondaryIndexes:
+      #   - IndexName: cardType-index
+      #     KeySchema:
+      #       - AttributeName: cardType
+      #         KeyType: HASH
+      #     Projection:
+      #       ProjectionType: ALL
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  PostCreditCardsApi:
+    Description: API Gateway endpoint URL for Prod stage for PostCreditCards function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/credit-cards/"
+  PostCreditCardsFunction:
+    Description: PostCreditCards Lambda Function ARN
+    Value: !GetAtt PostCreditCardsFunction.Arn
+  PostCreditCardsFunctionIamRole:
+    Description: Implicit IAM Role created for PostCreditCards function
+    Value: !GetAtt PostCreditCardsFunctionRole.Arn
+
+  GetCreditCardsApi:
+    Description: API Gateway endpoint URL for Prod stage for GetCreditCards function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/credit-cards/"
+  GetCreditCardsFunction:
+    Description: GetCreditCards Lambda Function ARN
+    Value: !GetAtt GetCreditCardsFunction.Arn
+  GetCreditCardsFunctionIamRole:
+    Description: Implicit IAM Role created for GetCreditCards function
+    Value: !GetAtt GetCreditCardsFunctionRole.Arn

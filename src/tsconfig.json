@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "es2020",
+      "strict": true,
+      "preserveConstEnums": true,
+      "noEmit": true,
+      "inlineSourceMap": true,
+      "inlineSources": true,
+      "module":"es2015",
+      "moduleResolution":"node",
+      "esModuleInterop": true, 
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true, 
+      "resolveJsonModule": true 
+    },
+    "include": ["src/**/*.ts","**/__tests__/**/*.test.ts"], 
+}
