@@ -6,9 +6,12 @@ import * as yup from 'yup';
 import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
 import { logResponse } from '../../utils/logUtils';
+import { createCard, createCardHolder, getPaymentClient } from '../../utils/paymentUtils';
 
 const cardsTableName = process.env.CARDS_TABLE as string;
+const paymentApiKey = process.env.PAYMENT_API_KEY as string;
 
+const paymentClient = getPaymentClient({ apiKey: paymentApiKey });
 const dbClient = getDbClient();
 
 const eventSchema = yup.object({
@@ -37,12 +40,16 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
 
         const { name, cardLimit, cardType } = parsedInput;
 
+        const { id: cardholderId } = await createCardHolder({ paymentClient, name });
+        const { id: originalCardNumber } = await createCard({ paymentClient, cardholderId });
+
         const cardId = uuid();
         const Item = {
             cardId: { S: cardId },
             cardType: { S: cardType },
             name: { S: name },
             cardLimit: { N: `${cardLimit}` },
+            originalCardNumber: { S: originalCardNumber },
         };
 
         const params = {
@@ -53,7 +60,7 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
 
         await putItem({ dbClient, params });
 
-        response = buildResponse({ statusCode: 200, body: { cardId, name, cardLimit } });
+        response = buildResponse({ statusCode: 200, body: { cardId, cardType, name, cardLimit, originalCardNumber } });
     } catch (err: unknown) {
         return handleErrors(err);
     }

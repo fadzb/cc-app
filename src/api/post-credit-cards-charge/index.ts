@@ -1,4 +1,4 @@
-import { getPaymentClient, issueTransaction } from './../../utils/paymentUtils';
+import { getPaymentClient } from './../../utils/paymentUtils';
 import { PutCreditCardByIdEvent } from '../../types';
 import { getDbClient, updateItem } from '../../utils/dbUtils';
 import { APIGatewayProxyResult } from 'aws-lambda';

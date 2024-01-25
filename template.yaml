@@ -31,6 +31,7 @@ Resources:
         Variables:
           # Make table name accessible as environment variable from function code during execution
           CARDS_TABLE: !Ref CardsTable
+          PAYMENT_API_KEY: !Ref PaymentApiKey
       Events:
         PostCreditCards:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

@@ -24,16 +24,41 @@ jest.mock('../../../utils/logUtils', () => ({
     },
 }));
 
+const mockPaymentClient = {};
+const mockCardholderId = 'mockCardholderId';
+const mockOriginalCardNumber = 'mockOriginalCardNumber';
+const mockGetPaymentClient = jest.fn(() => mockPaymentClient);
+const mockCreateCardHolder = jest.fn(() => ({ id: mockCardholderId }));
+const mockCreateCard = jest.fn(() => ({ id: mockOriginalCardNumber }));
+jest.mock('../../../utils/paymentUtils', () => ({
+    getPaymentClient: mockGetPaymentClient,
+    createCardHolder: mockCreateCardHolder,
+    createCard: mockCreateCard,
+}));
+
 jest.mock('uuid', () => ({ v4: () => 'uuid' }));
 
 import { lambdaHandler } from '../index';
 
 describe('POST /credit-cards', function () {
-    it('verifies successful response', async () => {
+    it('verifies successful response after creating card', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
+        expect(mockCreateCardHolder).toHaveBeenCalledWith({ paymentClient: mockPaymentClient, name: 'Paddy' });
+        expect(mockCreateCard).toHaveBeenCalledWith({
+            paymentClient: mockPaymentClient,
+            cardholderId: mockCardholderId,
+        });
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify({ cardId: 'uuid', name: 'Paddy', cardLimit: '1000' }));
+        expect(result.body).toEqual(
+            JSON.stringify({
+                cardId: 'uuid',
+                cardType: 'Visa',
+                name: 'Paddy',
+                cardLimit: '1000',
+                originalCardNumber: mockOriginalCardNumber,
+            }),
+        );
     });
 
     it('verifies validation error if cardholder name is empty', async () => {
