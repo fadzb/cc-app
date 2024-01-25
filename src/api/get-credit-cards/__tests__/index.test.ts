@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import getCreditCardsEvent from '../../../../events/getCreditCardsEvent.json';
+import event from '../../../../events/get-credit-cards/event.json';
 
 import { expect, describe, it } from '@jest/globals';
 
@@ -19,7 +19,7 @@ import { lambdaHandler } from '../index';
 
 describe('GET /credit-cards', function () {
     it('verifies successful response', async () => {
-        const result: APIGatewayProxyResult = await lambdaHandler(getCreditCardsEvent);
+        const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify([]));
@@ -29,7 +29,7 @@ describe('GET /credit-cards', function () {
         const mockedItems = [{ cardId: 'cardId', name: 'Paddy', cardLimit: 100, cardType: 'Visa' }];
         mockScanPromise.mockReturnValueOnce({ Items: mockedItems });
 
-        const result: APIGatewayProxyResult = await lambdaHandler(getCreditCardsEvent);
+        const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(JSON.stringify(mockedItems));

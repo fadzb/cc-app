@@ -1,4 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
+import { logger } from './logUtils';
 
 /**
  * @param {number} statusCode standardized HTTP status code to respond with
@@ -12,7 +13,7 @@ export const buildResponse = ({ statusCode, body }: { statusCode: number; body: 
     } as APIGatewayProxyResult);
 
 export const handleErrors = (err: unknown) => {
-    console.error(err);
+    logger.error(err);
 
     if (!(err instanceof Error)) {
         return buildResponse({ statusCode: 500, body: { message: 'Unknown error' } });

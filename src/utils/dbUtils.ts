@@ -10,7 +10,7 @@ export const getDbClient = () => {
 };
 
 /**
- * Scan table using the provided database client to return all items
+ * Scan table to return all items
  * @param dbClient the database client to use for the operation
  * @param {AWS.DynamoDB.Types.ScanInput} params the parameters used for the operation
  * @returns a Promise that resolves to a list of Items found in the table

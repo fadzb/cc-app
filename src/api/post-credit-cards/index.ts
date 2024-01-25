@@ -12,7 +12,7 @@ const cardsTableName = process.env.CARDS_TABLE as string;
 const dbClient = getDbClient();
 const schema = yup.object({
     name: yup.string().required(),
-    cardLimit: yup.number(),
+    cardLimit: yup.number().positive(),
     cardType: yup.string(),
 });
 
