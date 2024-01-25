@@ -1,16 +1,20 @@
-import { CreditCardInput } from './../../types.d';
+import { CreditCardInput, PostCreditCardEvent } from './../../types.d';
 import { getDbClient, putItem } from './../../utils/dbUtils';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
-import { validateEvent } from '../../utils/authUtils';
+import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
 import { logResponse } from '../../utils/logUtils';
 
 const cardsTableName = process.env.CARDS_TABLE as string;
 
 const dbClient = getDbClient();
-const schema = yup.object({
+
+const eventSchema = yup.object({
+    body: yup.string().required(),
+});
+const inputSchema = yup.object({
     name: yup.string().required(),
     cardLimit: yup.number().positive(),
     cardType: yup.string(),
@@ -23,29 +27,28 @@ const schema = yup.object({
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
-        if (!event.body) {
-            throw Error('No event body');
-        }
+        validateParams({ schema: eventSchema, params: event });
 
-        const parsedData = JSON.parse(event.body);
-        validateEvent({ schema, event: parsedData });
+        const parsedInput: CreditCardInput = JSON.parse(event.body);
+        validateParams({ schema: inputSchema, params: parsedInput });
 
-        const { name, cardLimit, cardType }: CreditCardInput = parsedData;
+        const { name, cardLimit, cardType } = parsedInput;
 
         const cardId = uuid();
         const Item = {
             cardId: { S: cardId },
             cardType: { S: cardType },
             name: { S: name },
-            cardLimit: { S: `${cardLimit}` },
+            cardLimit: { N: `${cardLimit}` },
         };
 
         const params = {
             TableName: cardsTableName,
             Item,
+            ConditionExpression: 'attribute_not_exists(cardId)', // TODO: test
         };
 
         await putItem({ dbClient, params });

@@ -1,4 +1,4 @@
-import { validateEvent } from './../../utils/authUtils';
+import { validateParams } from './../../utils/authUtils';
 import { buildResponse, handleErrors } from './../../utils/lambdaUtils';
 import { logResponse } from '../../utils/logUtils';
 import { getDbClient, scan } from '../../utils/dbUtils';
@@ -20,7 +20,7 @@ const schema = yup.object({});
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
-        validateEvent({ schema, event });
+        validateParams({ schema, params: event });
 
         const params = { TableName: cardsTableName };
         const { Items = [] } = await scan({ dbClient, params });

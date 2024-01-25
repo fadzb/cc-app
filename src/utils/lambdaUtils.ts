@@ -19,15 +19,23 @@ export const handleErrors = (err: unknown) => {
         return buildResponse({ statusCode: 500, body: { message: 'Unknown error' } });
     }
 
-    if (err.name === 'ResourceNotFoundException') {
-        return buildResponse({
-            statusCode: 404,
-            body: { message: 'Unable to call DynamoDB. Table resource not found.' },
-        });
+    switch (err.name) {
+        case 'ConditionalCheckFailedException': {
+            return buildResponse({
+                statusCode: 404,
+                body: { message: 'Item not found.' },
+            });
+        }
+        case 'ResourceNotFoundException': {
+            return buildResponse({
+                statusCode: 404,
+                body: { message: 'Unable to call DynamoDB. Table resource not found.' },
+            });
+        }
+        default:
+            return buildResponse({
+                statusCode: 500,
+                body: { message: err.message },
+            });
     }
-
-    return buildResponse({
-        statusCode: 500,
-        body: { message: err.message },
-    });
 };

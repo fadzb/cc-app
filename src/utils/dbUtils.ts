@@ -31,6 +31,22 @@ export const putItem = ({ dbClient, params }: { dbClient: AWS.DynamoDB; params: 
 };
 
 /**
+ * Edits an existing item's attributes, or adds a new item to the table if it does not already exist.
+ * @param dbClient the database client to use for the operation
+ * @param {AWS.DynamoDB.Types.UpdateItemInput} params the parameters used for the operation
+ * @returns a Promise that resolves to a list of Items found in the table
+ */
+export const updateItem = ({
+    dbClient,
+    params,
+}: {
+    dbClient: AWS.DynamoDB;
+    params: AWS.DynamoDB.Types.UpdateItemInput;
+}) => {
+    return dbClient.updateItem(params).promise();
+};
+
+/**
  * Queries for item by partition key value (and sort key if supported)
  * @param dbClient the database client to use for the operation
  * @param {AWS.DynamoDB.Types.QueryInput} params the parameters used for the operation

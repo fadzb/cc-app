@@ -1,4 +1,4 @@
-import { validateEvent } from '../../utils/authUtils';
+import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
 import { logResponse } from '../../utils/logUtils';
 import { getDbClient, query } from '../../utils/dbUtils';
@@ -25,7 +25,7 @@ const schema = yup.object({
 export const lambdaHandler = async (event: GetCreditCardByIdEvent): Promise<APIGatewayProxyResult> => {
     let response: APIGatewayProxyResult;
     try {
-        validateEvent({ schema, event });
+        validateParams({ schema, params: event });
 
         const {
             pathParameters: { id },

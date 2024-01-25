@@ -1,9 +1,3 @@
-export type CreditCardInput = {
-    name: string;
-    cardLimit?: number;
-    cardType?: string;
-};
-
 export type CreditCard = {
     cardId: string;
     name: string;
@@ -13,6 +7,17 @@ export type CreditCard = {
     deleted?: boolean;
 };
 
+export type CreditCardInput = {
+    name: string;
+    cardLimit?: number;
+    cardType?: string;
+};
+
+type PostCreditCardInput = {
+    body: string;
+};
+export type PostCreditCardEvent = Omit<APIGatewayProxyEvent, 'body'> & PostCreditCardInput;
+
 type IDInput = {
     id: string;
 };
@@ -21,4 +26,14 @@ type GetCreditCardByIdInput = {
 };
 export type GetCreditCardByIdEvent = Omit<APIGatewayProxyEvent, 'pathParameters'> & GetCreditCardByIdInput;
 
-export type APIEvent = APIGatewayProxyEvent | GetCreditCardByIdEvent;
+type CardLimitInput = {
+    cardLimit: number;
+};
+type PutCreditCardByIdInput = {
+    body: CardLimitInput;
+};
+export type PutCreditCardByIdEvent = Omit<APIGatewayProxyEvent, 'pathParameters', 'body'> &
+    GetCreditCardByIdInput &
+    PutCreditCardByIdInput;
+
+export type APIEvent = APIGatewayProxyEvent | PostCreditCardEvent | GetCreditCardByIdEvent | PutCreditCardByIdEvent;
