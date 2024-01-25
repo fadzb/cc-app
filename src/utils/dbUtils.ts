@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import { logger } from './logUtils';
 
 /**
  * @returns the database client for the application
