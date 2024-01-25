@@ -18,7 +18,7 @@ const eventSchema = yup.object({
 
 /**
  * Soft deletes an existing Credit Card account by id
- * Usage: curl -X DELETE http://localhost:3000/credit-cards/${id}
+ * Usage: curl -X DELETE http://localhost:3000/credit-cards/{id}
  * @param {Object} event - API Gateway Lambda Proxy Input Format
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *

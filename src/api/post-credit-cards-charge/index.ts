@@ -12,17 +12,17 @@ const dbClient = getDbClient();
 
 const eventSchema = yup.object({
     pathParameters: yup.object({
-        id: yup.string().required().uuid(),
+        originalCardNumber: yup.string().required().uuid(),
     }),
     body: yup.string().required(),
 });
 const inputSchema = yup.object({
-    cardLimit: yup.number().required().positive(),
+    amount: yup.number().required().positive(),
 });
 
 /**
- * Updates the cardLimit of an existing Credit Card
- * Usage: curl -d '{"cardLimit":"2000"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/{id}
+ * Charge the credit card account by the amount provided
+ * Usage: curl -d '{"amount":"10"}' -H "Content-Type: application/json" -X POST http://localhost:3000/credit-cards/${originalCardNumber}/charge
  * @param {Object} event - API Gateway Lambda Proxy Input Format
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
@@ -33,26 +33,28 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
         validateParams({ schema: eventSchema, params: event });
 
         const {
-            pathParameters: { id },
+            pathParameters: { originalCardNumber },
         } = event;
 
         const parsedInput = JSON.parse(event.body);
         validateParams({ schema: inputSchema, params: parsedInput });
 
-        const { cardLimit } = parsedInput;
+        const { amount } = parsedInput;
 
-        const params = {
-            TableName: cardsTableName,
-            Key: { cardId: { S: id } },
-            ConditionExpression: 'attribute_exists(cardId) and attribute_not_exists(deleted)',
-            UpdateExpression: 'set cardLimit = :cardLimit',
-            ExpressionAttributeValues: { ':cardLimit': { N: `${cardLimit}` } },
-            ReturnValues: 'ALL_NEW',
-        };
+        // Stripe API
 
-        const { Attributes } = await updateItem({ dbClient, params });
+        // const params = {
+        //     TableName: cardsTableName,
+        //     Key: { cardId: { S: originalCardNumber } },
+        //     ConditionExpression: 'attribute_exists(cardId) and attribute_not_exists(deleted)',
+        //     UpdateExpression: 'set cardLimit = :cardLimit',
+        //     ExpressionAttributeValues: { ':cardLimit': { N: `${cardLimit}` } },
+        //     ReturnValues: 'ALL_NEW',
+        // };
 
-        response = buildResponse({ statusCode: 200, body: Attributes });
+        // const { Attributes } = await updateItem({ dbClient, params });
+
+        response = buildResponse({ statusCode: 200, body: {} });
     } catch (err: unknown) {
         return handleErrors(err);
     }

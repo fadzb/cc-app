@@ -28,7 +28,7 @@ jest.mock('uuid', () => ({ v4: () => 'uuid' }));
 
 import { lambdaHandler } from '../index';
 
-describe('DELETE /credit-cards/${id}', function () {
+describe('DELETE /credit-cards/{id}', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 

@@ -26,7 +26,7 @@ jest.mock('../../../utils/logUtils', () => ({
 
 import { lambdaHandler } from '../index';
 
-describe('GET /credit-cards/${id}', function () {
+describe('GET /credit-cards/{id}', function () {
     it('verifies successful response', async () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 

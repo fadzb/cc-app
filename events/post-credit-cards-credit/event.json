@@ -1,20 +1,20 @@
 {
-  "httpMethod": "put",
-  "body": "{\"cardLimit\":\"2000\"}",
+  "httpMethod": "post",
+  "body": "{\"amount\":\"10\"}",
   "headers": {},
   "isBase64Encoded": false,
   "multiValueHeaders": {},
   "multiValueQueryStringParameters": {},
-  "path": "/credit-cards/{id}",
+  "path": "/credit-cards/{originalCardNumber}/credit",
   "pathParameters": {
-    "id": "26dac634-9de8-476d-9546-378b754bd64b"
+    "originalCardNumber": "26dac634-9de8-476d-9546-378b754bd64b"
   },
   "queryStringParameters": {},
   "requestContext": {
     "accountId": "123456789012",
     "apiId": "1234",
     "authorizer": {},
-    "httpMethod": "put",
+    "httpMethod": "post",
     "identity": {
       "accessKey": "",
       "accountId": "",
@@ -38,12 +38,12 @@
       "userAgent": "",
       "userArn": ""
     },
-    "path": "/credit-cards/{id}",
+    "path": "/credit-cards/{originalCardNumber}/credit",
     "protocol": "HTTP/1.1",
     "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
     "requestTimeEpoch": 1428582896000,
     "resourceId": "123456",
-    "resourcePath": "/credit-cards/{id}",
+    "resourcePath": "/credit-cards/{originalCardNumber}/credit",
     "stage": "dev"
   },
   "resource": "",
