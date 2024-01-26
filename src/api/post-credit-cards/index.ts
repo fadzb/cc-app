@@ -7,8 +7,11 @@ import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
 import { logResponse } from '../../utils/logUtils';
 import { createCard, createCardHolder, getPaymentClient } from '../../utils/paymentUtils';
+import { encipherText } from '../../utils/cryptoUtils';
 
 const cardsTableName = process.env.CARDS_TABLE as string;
+const secretAlgorithm = process.env.SECRET_ALGORITHM as string;
+const secretKey = process.env.SECRET_KEY as string;
 const paymentApiKey = process.env.PAYMENT_API_KEY as string;
 
 const paymentClient = getPaymentClient({ apiKey: paymentApiKey });
@@ -41,7 +44,13 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
         const { name, cardLimit, cardType } = parsedInput;
 
         const { id: cardholderId } = await createCardHolder({ paymentClient, name });
-        const { id: originalCardNumber } = await createCard({ paymentClient, cardholderId });
+        const { id: originalCardNumberPlaintext } = await createCard({ paymentClient, cardholderId });
+
+        const originalCardNumberCiphertext = encipherText({
+            secretAlgorithm,
+            secretKey,
+            plainText: originalCardNumberPlaintext,
+        });
 
         const cardId = uuid();
         const Item = {
@@ -49,7 +58,7 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
             cardType: { S: cardType },
             name: { S: name },
             cardLimit: { N: `${cardLimit}` },
-            originalCardNumber: { S: originalCardNumber },
+            originalCardNumber: { S: originalCardNumberCiphertext },
         };
 
         const params = {
@@ -60,7 +69,10 @@ export const lambdaHandler = async (event: PostCreditCardEvent): Promise<APIGate
 
         await putItem({ dbClient, params });
 
-        response = buildResponse({ statusCode: 200, body: { cardId, cardType, name, cardLimit, originalCardNumber } });
+        response = buildResponse({
+            statusCode: 200,
+            body: { cardId, cardType, name, cardLimit, originalCardNumber: originalCardNumberCiphertext },
+        });
     } catch (err: unknown) {
         return handleErrors(err);
     }

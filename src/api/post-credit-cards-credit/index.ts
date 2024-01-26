@@ -1,12 +1,15 @@
-import { getPaymentClient, issueCredit } from '../../utils/paymentUtils';
+import { PaymentError, getPaymentClient, issueCredit } from '../../utils/paymentUtils';
 import { PutCreditCardByIdEvent } from '../../types';
 import { APIGatewayProxyResult } from 'aws-lambda';
 import * as yup from 'yup';
 import { validateParams } from '../../utils/authUtils';
 import { buildResponse, handleErrors } from '../../utils/lambdaUtils';
-import { logResponse, logger } from '../../utils/logUtils';
+import { logResponse } from '../../utils/logUtils';
+import { decipherText } from '../../utils/cryptoUtils';
 
 const paymentApiKey = process.env.PAYMENT_API_KEY as string;
+const secretAlgorithm = process.env.SECRET_ALGORITHM as string;
+const secretKey = process.env.SECRET_KEY as string;
 
 const paymentClient = getPaymentClient({ apiKey: paymentApiKey });
 
@@ -33,7 +36,7 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
         validateParams({ schema: eventSchema, params: event });
 
         const {
-            pathParameters: { originalCardNumber },
+            pathParameters: { originalCardNumber: originalCardNumberCiphertext },
         } = event;
 
         const parsedInput = JSON.parse(event.body);
@@ -41,12 +44,25 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
 
         const { amount } = parsedInput;
 
-        const transaction = await issueCredit({ paymentClient, amount, originalCardNumber });
-
-        response = buildResponse({
-            statusCode: 200,
-            body: { message: `Account successfully credited for ${transaction.amount} ${transaction.currency}` },
+        const originalCardNumberPlaintext = decipherText({
+            secretAlgorithm,
+            secretKey,
+            cipherText: originalCardNumberCiphertext,
         });
+        try {
+            const transaction = await issueCredit({
+                paymentClient,
+                amount,
+                originalCardNumber: originalCardNumberPlaintext,
+            });
+
+            response = buildResponse({
+                statusCode: 200,
+                body: { message: `Account successfully credited for ${transaction.amount} ${transaction.currency}` },
+            });
+        } catch {
+            throw PaymentError.INVALID_CARD_DETAILS;
+        }
     } catch (err: unknown) {
         return handleErrors(err);
     }
