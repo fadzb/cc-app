@@ -1,5 +1,9 @@
 import Stripe from 'stripe';
 
+export const PaymentError = {
+    INVALID_CARD_DETAILS: 'Invalid card details',
+};
+
 /**
  *
  * @param {string} apiKey used to access the payment client

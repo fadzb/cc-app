@@ -24,6 +24,11 @@ jest.mock('../../../utils/logUtils', () => ({
     },
 }));
 
+const mockEncipherText = jest.fn();
+jest.mock('../../../utils/cryptoUtils', () => ({
+    encipherText: mockEncipherText,
+}));
+
 const mockPaymentClient = {};
 const mockCardholderId = 'mockCardholderId';
 const mockOriginalCardNumber = 'mockOriginalCardNumber';
@@ -42,12 +47,20 @@ import { lambdaHandler } from '../index';
 
 describe('POST /credit-cards', function () {
     it('verifies successful response after creating card', async () => {
+        const originalCardNumberCiphertext = 'cipherText';
+        mockEncipherText.mockReturnValueOnce(originalCardNumberCiphertext);
+
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(mockCreateCardHolder).toHaveBeenCalledWith({ paymentClient: mockPaymentClient, name: 'Paddy' });
         expect(mockCreateCard).toHaveBeenCalledWith({
             paymentClient: mockPaymentClient,
             cardholderId: mockCardholderId,
+        });
+        expect(mockEncipherText).toHaveBeenCalledWith({
+            secretAlgorithm: 'secretAlgorithm',
+            secretKey: 'secretKey',
+            plainText: mockOriginalCardNumber,
         });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(
@@ -56,7 +69,7 @@ describe('POST /credit-cards', function () {
                 cardType: 'Visa',
                 name: 'Paddy',
                 cardLimit: '1000',
-                originalCardNumber: mockOriginalCardNumber,
+                originalCardNumber: originalCardNumberCiphertext,
             }),
         );
     });

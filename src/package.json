@@ -8,6 +8,7 @@
     "license": "MIT",
     "dependencies": {
         "aws-sdk": "^2.799.0",
+        "crypto": "^1.0.1",
         "esbuild": "^0.14.14",
         "stripe": "^14.13.0",
         "uuid": "^9.0.1",
