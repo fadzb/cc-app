@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 export const PaymentError = {
-    INVALID_CARD_DETAILS: new Error('Invalid card details'),
+    INVALID_CARD_DETAILS: 'Invalid card details',
 };
 
 /**

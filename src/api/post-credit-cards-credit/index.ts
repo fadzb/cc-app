@@ -61,7 +61,7 @@ export const lambdaHandler = async (event: PutCreditCardByIdEvent): Promise<APIG
                 body: { message: `Account successfully credited for ${transaction.amount} ${transaction.currency}` },
             });
         } catch {
-            throw PaymentError.INVALID_CARD_DETAILS;
+            throw new Error(PaymentError.INVALID_CARD_DETAILS);
         }
     } catch (err: unknown) {
         return handleErrors(err);

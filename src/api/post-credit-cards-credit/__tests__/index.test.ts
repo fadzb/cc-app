@@ -24,11 +24,18 @@ jest.mock('../../../utils/logUtils', () => ({
     },
 }));
 
+const mockDecipherText = jest.fn();
+jest.mock('../../../utils/cryptoUtils', () => ({
+    ...jest.requireActual('../../../utils/cryptoUtils'),
+    decipherText: mockDecipherText,
+}));
+
 const mockTransaction = { amount: 10, currency: 'eur' };
 const mockPaymentClient = {};
 const mockGetPaymentClient = jest.fn(() => mockPaymentClient);
 const mockIssueCredit = jest.fn(() => mockTransaction);
 jest.mock('../../../utils/paymentUtils', () => ({
+    ...jest.requireActual('../../../utils/paymentUtils'),
     getPaymentClient: mockGetPaymentClient,
     issueCredit: mockIssueCredit,
 }));
@@ -39,12 +46,20 @@ import { lambdaHandler } from '../index';
 
 describe('POST /credit-cards/{originalCardNumber}/credit', function () {
     it('verifies successful response', async () => {
+        const originalCardNumberPlaintext = 'plainText';
+        mockDecipherText.mockReturnValueOnce(originalCardNumberPlaintext);
+
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(mockIssueCredit).toHaveBeenCalledWith({
             amount: JSON.parse(event.body).amount,
-            originalCardNumber: event.pathParameters.originalCardNumber,
+            originalCardNumber: originalCardNumberPlaintext,
             paymentClient: mockPaymentClient,
+        });
+        expect(mockDecipherText).toHaveBeenCalledWith({
+            secretAlgorithm: 'secretAlgorithm',
+            secretKey: 'secretKey',
+            cipherText: event.pathParameters.originalCardNumber,
         });
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(
@@ -74,5 +89,14 @@ describe('POST /credit-cards/{originalCardNumber}/credit', function () {
         expect(result.body).toEqual(
             JSON.stringify({ message: 'pathParameters.originalCardNumber is a required field' }),
         );
+    });
+
+    it('verifies payment error if issuing the charge fails', async () => {
+        mockIssueCredit.mockReturnValueOnce(null as any);
+
+        const result: APIGatewayProxyResult = await lambdaHandler(event);
+
+        expect(result.statusCode).toEqual(500);
+        expect(result.body).toEqual(JSON.stringify({ message: 'Invalid card details' }));
     });
 });
